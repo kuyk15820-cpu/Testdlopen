@@ -5,6 +5,10 @@
 #define APP_ID @"com.yourdomain.dylibtester"
 #define APP_NAME @"DylibTester"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern NSString *getExecutablePath(void);
 extern NSString *rootHelperPath(void);
 extern int spawnRoot(NSString* path, NSArray* args, NSString** stdOut, NSString** stdErr);
@@ -12,6 +16,10 @@ extern void killall(NSString* processName, BOOL softly);
 extern void respring(void);
 
 extern void fetchLatestLdidVersion(void (^completionHandler)(NSString* latestVersion));
+
+#ifdef __cplusplus
+}
+#endif
 
 @interface UIAlertController (Private)
 @property (setter=_setAttributedTitle:, getter=_attributedTitle, nonatomic, copy) NSAttributedString* attributedTitle;
