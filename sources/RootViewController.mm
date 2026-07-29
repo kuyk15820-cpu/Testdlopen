@@ -42,7 +42,7 @@
     return [paths.firstObject stringByAppendingPathComponent:@"ldid"];
 }
 
-- (void)checkAndDownloadLdid {
+/*- (void)checkAndDownloadLdid {
     NSString *ldidPath = [self ldidSavePath];
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:ldidPath]) {
@@ -62,6 +62,48 @@
         NSURL *downloadURL = [NSURL URLWithString:@"https://github.com/opa334/ldid/releases/latest/download/ldid"];
         
         NSURLSessionDownloadTask *task = [[NSURLSession sharedURLSession] downloadTaskWithURL:downloadURL completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
+            if (error) {
+                [self appendLog:[NSString stringWithFormat:@"❌ Download ldid failed: %@", error.localizedDescription]];
+                return;
+            }
+            
+            NSError *fileError = nil;
+            [[NSFileManager defaultManager] moveItemAtPath:location.path toPath:ldidPath error:&fileError];
+            
+            if (fileError) {
+                [self appendLog:[NSString stringWithFormat:@"❌ Save ldid failed: %@", fileError.localizedDescription]];
+                return;
+            }
+            
+            chmod([ldidPath UTF8String], 0755);
+            [self appendLog:@"✅ ldid downloaded & ready to use! (chmod +x)"];
+        }];
+        
+        [task resume];
+    });
+}*/
+
+- (void)checkAndDownloadLdid {
+    NSString *ldidPath = [self ldidSavePath];
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:ldidPath]) {
+        [self appendLog:@"✅ Found cached ldid binary in Documents."];
+        return;
+    }
+    
+    [self appendLog:@"🔍 Checking latest ldid version from GitHub..."];
+    
+    fetchLatestLdidVersion(^(NSString *latestVersion) {
+        if (!latestVersion) {
+            [self appendLog:@"⚠️ Failed to check version, downloading default ldid..."];
+        } else {
+            [self appendLog:[NSString stringWithFormat:@"🌐 Latest ldid version: %@", latestVersion]];
+        }
+        
+        NSURL *downloadURL = [NSURL URLWithString:@"https://github.com/opa334/ldid/releases/latest/download/ldid"];
+        
+        // แก้ไขจุดนี้: เปลี่ยนจาก [NSURLSession sharedURLSession] เป็น [NSURLSession sharedSession]
+        NSURLSessionDownloadTask *task = [[NSURLSession sharedSession] downloadTaskWithURL:downloadURL completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
             if (error) {
                 [self appendLog:[NSString stringWithFormat:@"❌ Download ldid failed: %@", error.localizedDescription]];
                 return;
