@@ -35,9 +35,11 @@ $(APPLICATION_NAME)_SWIFTFLAGS = -I.
 
 $(APPLICATION_NAME)_CCFLAGS += -std=c++17 -fno-rtti -DNDEBUG -Wall -fvisibility=hidden -Wno-unused-variable
 
-$(APPLICATION_NAME)_LDFLAGS += -lc++ -F./deps -Wl,-rpath,@executable_path/Frameworks -rdynamic
+# [ปรับปรุง] เปลี่ยน -lstdc++ เป็น -lc++ และเพิ่ม -rdynamic สำหรับ dlopen
+$(APPLICATION_NAME)_LDFLAGS += -lc++ -undefined dynamic_lookup -F./deps -Wl,-rpath,@executable_path/Frameworks -rdynamic
 
-$(APPLICATION_NAME)_FRAMEWORKS += UIKit Foundation CoreGraphics QuartzCore Security AVFoundation AudioToolbox CoreMedia MobileCoreServices SystemConfiguration ImageIO WebKit UniformTypeIdentifiers PhotosUI CoreText
+$(APPLICATION_NAME)_FRAMEWORKS += UIKit Foundation CoreGraphics QuartzCore Security AVFoundation AudioToolbox CoreMedia MobileCoreServices SystemConfiguration ImageIO WebKit UniformTypeIdentifiers PhotosUI CoreText CFNetwork Network
+
 $(APPLICATION_NAME)_EXTRA_FRAMEWORKS += ffmpegkit Lottie
 
 $(APPLICATION_NAME)_CODESIGN_FLAGS += -Slayout/entitlements.plist
